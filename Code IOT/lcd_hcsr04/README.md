@@ -1,5 +1,6 @@
 # Git-of-Tuan 
-
+## Tìm hiểu bộ lọc "Kalman Filter"
+## Code nhấn 1 lần đọc 10 lần hc_sr04 và in ra giá trị trung bình
 			#include <Wire.h>
 			#include <LiquidCrystal_I2C.h>
 				int trig = 11; //= 25;
