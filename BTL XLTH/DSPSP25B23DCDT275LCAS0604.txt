@@ -1,0 +1,35 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.fft import fft, fftfreq
+from scipy.io.wavfile import write
+
+Fs = 8000       
+duration = 0.5 
+volume = 0.5
+
+notes = {
+    "Do4": 261.63,
+    "Fa4": 349.23,
+    "La4": 440.00,
+}
+
+def generate_tone(frequency, duration, Fs):
+    t = np.linspace(0, duration, int(Fs * duration), endpoint=False)
+    return volume * np.sin(2 * np.pi * frequency * t)
+
+scale_signal = np.concatenate([generate_tone(f, duration, Fs) for f in notes.values()])
+
+write("scale.wav", Fs, (scale_signal * 32767).astype(np.int16))
+
+N = len(scale_signal)
+X = fft(scale_signal)
+X_mag = np.abs(X[:N // 2]) * 2 / N
+freqs = fftfreq(N, 1/Fs)[:N // 2]
+
+plt.figure(figsize=(10, 5))
+plt.plot(freqs, X_mag)
+plt.title("Phân tích FFT cho toàn bộ dãy nốt")
+plt.ylabel("Tần số (Hz)")
+plt.grid(True)
+plt.xlim(0, 1000)  
+plt.show()
