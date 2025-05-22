@@ -263,12 +263,12 @@
 				
 		 for(int i = 0; i < 135; i+= 15) // hiển thị 10 cột 
 		 {
-				display.read_hc_sr04();
+				display.read_hc_sr04(); // đọc nút ấn
 				Serial.println(distance);
 			   tft.fillRect(i + 15, 80-distance, 10, distance, ST77XX_BLUE); // hiển thị biểu đồ
 			   tft.setCursor(i + 15, 90); // hiển thị số
 			   if(distance >= 100) tft.print("O");
-			   else tft.print(distance);
+			   else tft.print(distance); // in ra giá trị khoảng cách đo được
 
 			delay(1000);
 		 }
