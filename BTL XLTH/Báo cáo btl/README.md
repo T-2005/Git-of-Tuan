@@ -279,7 +279,8 @@
 # B. Mục tiêu nhiệm vụ
 - Đọc tín hiệu mà cảm biến HCSr04 trả về, biến đổi và đưa tín hiệu đó về dạng khoảng cách đơn vị cm
 - Hiện thị khoảng cách lên màn hình Oled dưới dạng biểu đồ cột
-- Hiện thị giá trị trung bình, nếu nhỏ hơn 100 cm thì in ra giá trị trung bình còn không thì in ra "Overload"
+- Hiện thị giá trị trung bình dưới dạng số thực sau dấu phẩy 2 chữ số, nếu nhỏ hơn 100 cm thì in ra giá
+trị trung bình còn không thì in ra "Overload"
 - Sử dụng nút ấn đọc giá trị cảm biến 10 lần, sau 10 lần ấn nút để reset và đo lại từ đâu
 
   
