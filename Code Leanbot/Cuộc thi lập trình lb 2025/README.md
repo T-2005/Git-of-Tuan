@@ -1,12 +1,12 @@
 # Git-of-Tuan - Code Leanbot
 
-/*
-  Basic Leanbot Motion
+		/*
+		  Basic Leanbot Motion
 
-  Wait for TB1A+TB1B touch signal, then go straight for 100 mm, then stop.
+		  Wait for TB1A+TB1B touch signal, then go straight for 100 mm, then stop.
 
-  More Leanbot examples at  https://git.pythaverse.space/leanbot/Examples
-*/
+		  More Leanbot examples at  https://git.pythaverse.space/leanbot/Examples
+		*/
 
 
 		#include <Leanbot.h>                    // use Leanbot library
