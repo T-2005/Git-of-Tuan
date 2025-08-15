@@ -1,6 +1,20 @@
 # Git-of-Tuan - Báo cáo BTL - XLTH - 26/4/2025
 
-# A. Công việc đã làm 
+# Họ tên và mã sinh viên
+
+	Lê Ngọc Tuấn - B23DCDT275 - DSPSP25PROJ11
+	Hoàng Hải Đăng - B23DCDT303 - DSPSP25PROJ11
+	Trần Đại Hiệp - B23DCDT087 - DSPSP25PROJ11
+	Nguyễn Văn Toàn - B23DCDT259 - DSPSP25PROJ11
+
+## Thư viện dùng trong dự án
+	"Adafruit_ST7735.h" dùng cho màn hình hiển thị oled ST7735
+## Mô tả ngắn gọn về dự án
+	- Đề tài: Thu thập tín hiệu từ module cảm biến siêu âm HC-SR04 
+và hiện thị tín hiệu lên màn hình Oled Giao tiếp SPI ST7735.
+	- Tóm tắt nội dung: Dữ liệu hiển thị lên màn hình là tín hiệu
+của HCSr04, giá trị trung bình thu được sau 10 lần đo.Nếu vượt 
+quá 100 thì in ra “overload”, ngược lại in ra giá trị trung bình.
 
 ## Công cụ: 
 - Oled ST7735 150x200

@@ -1,0 +1,11 @@
+Nhóm 06 - kíp 2 sáng Thứ 6
+
+Họ tên và mã sinh viên
+
+	Lê Ngọc Tuấn - B23DCDT275 - DSPSP25PROJ11
+	Hoàng Hải Đăng - B23DCDT303 - DSPSP25PROJ11
+	Trần Đại Hiệp - B23DCDT087 - DSPSP25PROJ11
+	Nguyễn Văn Toàn - B23DCDT259 - DSPSP25PROJ11
+
+Muốn nạp code vào dự án thì cần có phần mềm Arduino IDE, cần cài đặt thư viện "Adafruit_ST7735.h" để 
+sử dụng màn hình Oled ST7735
