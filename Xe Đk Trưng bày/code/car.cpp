@@ -1,14 +1,14 @@
 #include "car.h"
-
+#include "firebase.h"
 int PWM1 = 25;
 int AIN1 = 13;
 int AIN2 = 14;
 int ENA = 33;
 
 int PWM2 = 26;
-int BIN1 = 12;
-int BIN2 = 27;  
-int speed;
+int BIN1 = 27;
+int BIN2 = 12;  
+
 void car :: init()
 {
   pinMode(PWM1, OUTPUT);
@@ -27,46 +27,45 @@ void car:: end() // xe ko hoat dong
 {
   digitalWrite(ENA, LOW);
 }
-void car :: forward(int& speed) // di thang
+void car :: forward(int& v) // di thang
 {
   digitalWrite(AIN1,HIGH); 
   digitalWrite(AIN2,LOW);
-   analogWrite(PWM1,speed); 
+  analogWrite(PWM1,v);
+
   digitalWrite(BIN1,HIGH); 
   digitalWrite(BIN2,LOW);
-
-  analogWrite(PWM2, speed); 
+  analogWrite(PWM2, v); 
  
 }
-void car :: back(int& speed)
+void car :: back(int& v)
 {
   digitalWrite(AIN1,LOW); 
   digitalWrite(AIN2,HIGH);
-   analogWrite(PWM1,speed);
+  analogWrite(PWM1,v);
 
   digitalWrite(BIN1,LOW); 
   digitalWrite(BIN2,HIGH);
-
-  analogWrite(PWM2,speed);
+  analogWrite(PWM2,v);
 }
-void car :: turn_right_rotation(int& speed)
+void car :: turn_right_rotation(int& v)
 {
   digitalWrite(AIN1,HIGH); 
   digitalWrite(AIN2, LOW);
-  analogWrite(PWM1,speed); 
+  analogWrite(PWM1,v); 
+
   digitalWrite(BIN1,LOW); 
   digitalWrite(BIN2,HIGH);
-  analogWrite(PWM1,speed); 
-  analogWrite(PWM2,speed);
+  analogWrite(PWM2,v);
 }
-void car :: turn_left_rotation(int& speed)
+void car :: turn_left_rotation(int& v)
 {
   digitalWrite(AIN1,LOW); 
   digitalWrite(AIN2, HIGH);
-  analogWrite(PWM1,speed); 
+  analogWrite(PWM1,v); 
+
   digitalWrite(BIN1,HIGH); 
   digitalWrite(BIN2,LOW);
-  analogWrite(PWM1,speed); 
-  analogWrite(PWM2,speed); 
+  analogWrite(PWM2,v); 
 }
-void car :: wheel_A(int value_AIN1, int )
+
