@@ -12,10 +12,10 @@ class carhouse{
   public :
   static void init_house();
   static void stop();
-  static void motor_1_Tien(int& sp);
-  static void motor_2_Tien(int& sp);
-  static void motor_1_Lui(int& sp);
-  static void motor_2_Lui(int& sp);
+  static void motor_trai_Tien(int& sp);
+  static void motor_phai_Tien(int& sp);
+  static void motor_trai_Lui(int& sp);
+  static void motor_phai_Lui(int& sp);
 
 };
 #endif
