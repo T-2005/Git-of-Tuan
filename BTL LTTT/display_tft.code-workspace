@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"name": "display_tft",
+			"path": "../../../../PlatformIO/Projects/display_tft"
+		},
+		{
+			"name": "BTL LTTT",
+			"path": "."
+		}
+	],
+	"settings": {}
+}
