@@ -1,58 +1,65 @@
 #include <Arduino.h>
-#include <screen.h>
+#include <Adafruit_ST7735.h>
+#include <Adafruit_ST7789.h>
+#include <Adafruit_ST7796S.h>
+#include <Adafruit_ST77xx.h>
+#include <stream.h>
+#include <stdint.h> 
 
+#define green ST7735_GREEN
+#define black ST7735_BLACK
+#define red   ST7735_RED
+#define white ST7735_WHITE
 
-/*
-  tft.drawPixel(x, y, color); Vẽ điểm
-  tft.drawLine(x0, y0, x1, y1, color); Vẽ đường
+// Chân kết nối
+int TFT_CS = 15;
+int TFT_RST = 4;
+int TFT_DC = 2;
 
-  tft.drawRect(x, y, w, h, color);    // viền chữ nhật
-  tft.fillRect(x, y, w, h, color);    // tô đầy
+// Khởi tạo màn hình
+Adafruit_ST7735 tft = Adafruit_ST7735(TFT_CS, TFT_DC, TFT_RST);
 
-  tft.drawCircle(x, y, r, color);     // viền hình tròn
-  tft.fillCircle(x, y, r, color);     // tô đầy
+// Vị trí dòng hiện tại
+int y = 5;
+const int lineHeight = 14; // khoảng cách giữa các dòng
 
-  tft.drawTriangle(x0, y0, x1, y1, x2, y2, color);  tam giác
-  tft.fillTriangle(x0, y0, x1, y1, x2, y2, color);
-
-  tft.drawRoundRect(x, y, w, h, r, color); elip F
-  tft.fillRoundRect(x, y, w, h, r, color);
-
-  tft.setCursor(x, y);
-  tft.setTextColor(ILI9341_WHITE);      // màu chữ
-  tft.setTextColor(ILI9341_WHITE, ILI9341_BLACK); // chữ + nền
-  tft.setTextSize(2);
-  tft.println("Hello TFT!");
-
-  Hàm	Chức năng
-  tft.fillScreen(color)	Tô toàn màn hình
-  tft.setRotation(n)	Xoay màn hình (0–3)
-  tft.width() / tft.height()	Lấy kích thước hiện tại
-  tft.invertDisplay(true/false)	Đảo màu
-  tft.drawBitmap(x, y, bitmap, w, h, color)	Vẽ ảnh đơn sắc
-  tft.drawRGBBitmap(x, y, bitmap, w, h)	Vẽ ảnh màu (16-bit RGB565)
-
-
-
-
-*/
-
-
-
-screen scr;
-
-void setup()
-{
-  pinMode(_trap, INPUT);
+void setup() {
   Serial.begin(115200);
-  scr.init();
+  Serial1.begin(115200, SERIAL_8N1, 32, 33); // UART1: RX=32, TX=33
+
+  tft.initR(INITR_BLACKTAB);
+  tft.setRotation(1);
+  tft.fillScreen(white);
+
+  tft.setTextSize(2);
+  tft.setTextColor(black);
+  tft.setCursor(5, y);
+  tft.println("Waiting data...");
+  y += lineHeight;
 }
 
+void loop() {
+  if (Serial1.available() > 0) {
+    String t = Serial1.readStringUntil('\n');
+    t.trim();
 
- 
-void loop()
-{
-  scr._solve();
+    Serial.print("Nhan duoc: ");
+    Serial.println(t);
+
+    // In ra dòng mới
+    tft.setTextSize(2);
+    tft.setTextColor(black);
+    tft.setCursor(5, y);
+    tft.println(t);
+
+    // Tăng vị trí xuống dòng
+    y += lineHeight;
+
+    // Nếu vượt quá chiều cao màn hình thì xóa màn hình và in lại từ đầu
+    if (y > tft.height() - lineHeight) {
+      delay(500); // chờ 0.5s để người xem đọc kịp
+      //tft.fillScreen(white);
+      y = 5;
+    }
+  }
 }
-
-

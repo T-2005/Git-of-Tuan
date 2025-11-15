@@ -1,24 +1,17 @@
 #include "screen.h"
 
-int check = 0;
-int tmp;
-int TFT_CS = 15;
-int TFT_RST = 4;
-int TFT_DC = 2;
-int _trap = 32;
-int a[100] = {0}, k = 0;
-Adafruit_ST7735 tft = Adafruit_ST7735(TFT_CS, TFT_DC, TFT_RST);
+
 void screen ::init()
 {
   tft.initR(INITR_BLACKTAB);
-  tft.setRotation(3);
+  tft.setRotation(1);
   tft.fillScreen(ST7735_WHITE);
 
   // tft.drawRect(40, 0, 90, 128, ST7735_RED);  // h2
   // tft.drawRect(90, 0, 140, 128, ST7735_RED); // h3
   tft.drawRect(0, 0, 70, 15, ST7735_GREEN); // h1-c1
   tft.setCursor(5, 5);
-  tft.setTextSize(1);
+  tft.setTextSize(0);
   tft.setTextColor(ST7735_BLACK);
   tft.println("SIMULATION:");
 

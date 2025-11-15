@@ -25,7 +25,8 @@ void setup() {
   lcd2.print("Waiting...");
 
   Serial.begin(115200);                      
-  Serial2.begin(115200, SERIAL_8N1, 16, 17);   // UART2: RX=16, TX=17
+  Serial2.begin(115200, SERIAL_8N1, 16, 17);   // UART2: RX=16, TX=17 -> kenh phat
+  Serial1.begin(115200, SERIAL_8N1, 18, 19); // UART1: RX = 18, TX = 19 -> kenh thu
   while (Serial2.available()) Serial2.read();  // clear buffer
   
   Serial.println("ESP32 Ready - LE NGOC TUAN");
@@ -33,27 +34,40 @@ void setup() {
   pinMode(BT1, INPUT_PULLUP);
   pinMode(BT2, INPUT_PULLUP);
   pinMode(BT3, INPUT_PULLUP);
+  Serial1.print("P=");
+  Serial1.print(p);
 }
 
 void loop() {
   bitErr = 0;
   // --- GỬI DỮ LIỆU từ PC -> STM32 ---
-  if (Serial.available()) {
-    String t = Serial.readStringUntil('\n');
-    t.trim();
-    if (t.length() > 0) {
-      Serial2.print(t);
-      Serial2.write('\n');
-      Serial.print("Da gui: ");
-      Serial.println(t);
-    }
+  //if (Serial.available()) 
+  // Serial.println(_button(BT1));
+  // if(_button(BT1))
+  {
+    button2();
+    button3();
   }
-
+    
   // --- NHẬN DỮ LIỆU từ STM32 -> LCD ---
-  _lcd_display();
+  button();
 }
 
 void _lcd_display(void) {
+  char t = '1';
+    // if (t.length() > 0) {
+      Serial2.print(t);
+      Serial2.write('\n');
+      // Serial1.print(t);
+      // Serial1.print('\n');
+      Serial.print("Da gui: ");
+      Serial.println(t);
+  // đọc data gửi từ kênh phát 
+  unsigned long startTime = millis();
+  while (!Serial2.available() && millis() - startTime < 1000) {
+    delay(10);  // chờ tối đa 1 giây
+  }
+
   if (Serial2.available()) {
     int n = Serial2.readBytes(a, 32);
     a[n] = '\0'; // kết thúc chuỗi an toàn
@@ -87,11 +101,15 @@ void _lcd_display(void) {
       // In ra LCD2
       if (i == 16) lcd2.setCursor(0, 1);
       lcd2.print(a[i]);
-      delay(100); // chờ hiển thị
+     // delay(100); // chờ hiển thị
     }
+    Serial.print("Gia tri p: "); Serial.println(p);
     Serial.print("Bit BSC:   ");
     Serial.println(a);
     BER = (float)bitErr / n;
+  //  Serial1.print("Ty so BER: ");  Serial1.print(BER, 4); Serial1.write('\n');
+    Serial1.print("BER=");
+    Serial1.println(BER, 4);
     Serial.print("Ti so BER: "); Serial.println(BER, 4);
     // lcd2.setCursor(0, 1);
     // lcd2.print("BER=");
@@ -100,4 +118,57 @@ void _lcd_display(void) {
     // Xóa buffer UART tránh đọc rác
     while (Serial2.available()) Serial2.read();
   }
+}
+int _button(int BT)
+{
+      return digitalRead(BT);
+}
+void button() {
+  static bool lastState = LOW;  // nhớ trạng thái nút lần trước
+  bool currentState = digitalRead(BT1);
+
+  if (lastState == LOW && currentState == HIGH) {  // phát hiện nhấn xuống
+    delay(20);  // chống dội
+    if (digitalRead(BT1) == HIGH) {
+      _lcd_display();   // Gửi dữ liệu ngay khi nhấn
+     // Serial1.print("Gia tri p: "); Serial1.print(p); Serial1.write('\n');
+    }
+  }
+
+  lastState = currentState;  // cập nhật trạng thái
+}
+
+ void button2()
+{
+  static bool lastState2 = LOW;  // nhớ trạng thái nút lần trước
+  bool currentState2 = digitalRead(BT2);
+
+  if (lastState2 == LOW && currentState2 == HIGH) {  // phát hiện nhấn xuống
+    delay(20);  // chống dội
+    if (digitalRead(BT2) == HIGH && p <= 1.0) {
+      p = p + 0.1;
+      Serial1.print("P=");
+      Serial1.println(p, 3);
+    }
+
+  }
+
+  lastState2 = currentState2;  // cập nhật trạng thái
+}
+  void button3()
+{
+  static bool lastState3 = LOW;  // nhớ trạng thái nút lần trước
+  bool currentState3 = digitalRead(BT3);
+
+  if (lastState3 == LOW && currentState3 == HIGH) {  // phát hiện nhấn xuống
+    delay(20);  // chống dội
+    if (digitalRead(BT3) == HIGH && p >= 0.0 ) {
+      p = p - 0.1;
+      Serial1.print("P=");
+      Serial1.println(p, 3);
+      // Serial1.print("Gia tri xac suat loi p la: "); Serial1.print(p); Serial1.write('\n');
+    }
+  }
+
+  lastState3 = currentState3;  // cập nhật trạng thái
 }
