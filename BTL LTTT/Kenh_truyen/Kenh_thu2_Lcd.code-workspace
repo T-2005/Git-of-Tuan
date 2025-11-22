@@ -1,0 +1,15 @@
+{
+	"folders": [
+		{
+			"path": "../Kenh_thu2_Lcd"
+		},
+		{
+			"name": "Kenh_thu_lcd",
+			"path": "../../../../../PlatformIO/Projects/Kenh_thu_lcd"
+		},
+		{
+			"path": "../../../../../PlatformIO/Projects/Kenh_thu"
+		}
+	],
+	"settings": {}
+}

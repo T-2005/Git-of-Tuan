@@ -1,13 +1,13 @@
 #include <Arduino.h>
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
-
+#include "esp_system.h"
 #define BT1 32
 #define BT2 33
 #define BT3 25
-
-LiquidCrystal_I2C lcd1(0x26, 16, 2); // LCD phát
-LiquidCrystal_I2C lcd2(0x27, 16, 2); // LCD nhận
+#define BT4 5
+LiquidCrystal_I2C lcd1(0x27, 16, 2); // LCD phát
+LiquidCrystal_I2C lcd2(0x26, 16, 2); // LCD nhận
 char a[33]; // 32 ký tự + '\0'
 
 float p = 0.300; // Xác suất lỗi bit
@@ -34,6 +34,7 @@ void setup() {
   pinMode(BT1, INPUT_PULLUP);
   pinMode(BT2, INPUT_PULLUP);
   pinMode(BT3, INPUT_PULLUP);
+  pinMode(BT4, INPUT_PULLUP);
   Serial1.print("P=");
   Serial1.print(p);
 }
@@ -107,22 +108,16 @@ void _lcd_display(void) {
     Serial.print("Bit BSC:   ");
     Serial.println(a);
     BER = (float)bitErr / n;
-  //  Serial1.print("Ty so BER: ");  Serial1.print(BER, 4); Serial1.write('\n');
+  
     Serial1.print("BER=");
     Serial1.println(BER, 4);
     Serial.print("Ti so BER: "); Serial.println(BER, 4);
-    // lcd2.setCursor(0, 1);
-    // lcd2.print("BER=");
-    // lcd2.print(BER, 2);
-
+   
     // Xóa buffer UART tránh đọc rác
     while (Serial2.available()) Serial2.read();
   }
 }
-int _button(int BT)
-{
-      return digitalRead(BT);
-}
+
 void button() {
   static bool lastState = LOW;  // nhớ trạng thái nút lần trước
   bool currentState = digitalRead(BT1);
@@ -171,4 +166,21 @@ void button() {
   }
 
   lastState3 = currentState3;  // cập nhật trạng thái
+}
+  void button4()
+{
+  static bool lastState4 = LOW;  // nhớ trạng thái nút lần trước
+  bool currentState4 = digitalRead(BT4);
+
+  if (lastState4 == LOW && currentState4 == HIGH) {  // phát hiện nhấn xuống
+    delay(20);  // chống dội
+    if (digitalRead(BT4) == HIGH ) {
+      
+      
+      Serial1.println(2);
+      // Serial1.print("Gia tri xac suat loi p la: "); Serial1.print(p); Serial1.write('\n');
+    }
+  }
+
+  lastState4 = currentState4;  // cập nhật trạng thái
 }
