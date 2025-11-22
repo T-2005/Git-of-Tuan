@@ -1,4 +1,4 @@
-./objects/main.o: main.c \
+./objects/uart.o: UART.c UART.h \
   C:\Users\Ngoc\ Tuan\AppData\Local\Arm\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include\stm32f10x.h \
   RTE\_Scr\RTE_Components.h \
   C:\Users\Ngoc\ Tuan\AppData\Local\Arm\Packs\ARM\CMSIS\6.2.0\CMSIS\Core\Include\core_cm3.h \
@@ -7,5 +7,4 @@
   C:\Users\Ngoc\ Tuan\AppData\Local\Arm\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\StdPeriph_Driver\inc\stm32f10x_gpio.h \
   C:\Users\Ngoc\ Tuan\AppData\Local\Arm\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\StdPeriph_Driver\inc\stm32f10x_rcc.h \
   C:\Users\Ngoc\ Tuan\AppData\Local\Arm\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\StdPeriph_Driver\inc\stm32f10x_usart.h \
-  C:\Users\Ngoc\ Tuan\AppData\Local\Arm\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\StdPeriph_Driver\inc\misc.h \
-  ADC.h UART.h
+  C:\Users\Ngoc\ Tuan\AppData\Local\Arm\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\StdPeriph_Driver\inc\misc.h

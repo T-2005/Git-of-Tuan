@@ -22,20 +22,22 @@ Dialog DLL:      TCM.DLL V1.56.6.0
  
 <h2>Project:</h2>
 D:\Desktop\STM32\Project\kenh_phat\Kenh_phat.uvprojx
-Project File Date:  11/08/2025
+Project File Date:  11/10/2025
 
 <h2>Output:</h2>
 *** Using Compiler 'V6.24', folder: 'C:\Users\Ngoc Tuan\AppData\Local\Keil_v5\ARM\ARMCLANG\Bin'
 Rebuild target 'Scr'
-compiling stm32f10x_rcc.c...
 compiling stm32f10x_gpio.c...
-assembling startup_stm32f10x_md.s...
-compiling stm32f10x_usart.c...
-compiling system_stm32f10x.c...
-compiling misc.c...
+compiling stm32f10x_rcc.c...
 compiling main.c...
+compiling ADC.c...
+compiling misc.c...
+compiling UART.c...
+compiling stm32f10x_usart.c...
+assembling startup_stm32f10x_md.s...
+compiling system_stm32f10x.c...
 linking...
-Program Size: Code=1552 RO-data=260 RW-data=0 ZI-data=2248  
+Program Size: Code=1688 RO-data=252 RW-data=0 ZI-data=1736  
 ".\Objects\Kenh_phat.axf" - 0 Error(s), 0 Warning(s).
 
 <h2>Software Packages used:</h2>
@@ -68,30 +70,30 @@ Package Vendor: Keil
    * Component: ARM::CMSIS:CORE@6.1.1
 
    * Component: Keil::Device:Startup@1.0.0
-      Include file:  RTE_Driver/Config/RTE_Device.h
-      Source file:   Device/Source/ARM/startup_stm32f10x_md.s
       Source file:   Device/Source/ARM/STM32F1xx_OPT.s
       Source file:   Device/Source/system_stm32f10x.c
+      Source file:   Device/Source/ARM/startup_stm32f10x_md.s
+      Include file:  RTE_Driver/Config/RTE_Device.h
 
    * Component: Keil::Device:StdPeriph Drivers:Framework@3.6.0
-      Include file:  Device/StdPeriph_Driver/inc/misc.h
-      Source file:   Device/StdPeriph_Driver/templates/stm32f10x_conf.h
       Source file:   Device/StdPeriph_Driver/src/misc.c
       Include file:  Device/StdPeriph_Driver/templates/stm32f10x_it.h
       Source file:   Device/StdPeriph_Driver/templates/stm32f10x_it.c
+      Include file:  Device/StdPeriph_Driver/inc/misc.h
+      Source file:   Device/StdPeriph_Driver/templates/stm32f10x_conf.h
 
    * Component: Keil::Device:StdPeriph Drivers:GPIO@3.6.0
-      Include file:  Device/StdPeriph_Driver/inc/stm32f10x_gpio.h
       Source file:   Device/StdPeriph_Driver/src/stm32f10x_gpio.c
+      Include file:  Device/StdPeriph_Driver/inc/stm32f10x_gpio.h
 
    * Component: Keil::Device:StdPeriph Drivers:RCC@3.6.0
-      Include file:  Device/StdPeriph_Driver/inc/stm32f10x_rcc.h
       Source file:   Device/StdPeriph_Driver/src/stm32f10x_rcc.c
+      Include file:  Device/StdPeriph_Driver/inc/stm32f10x_rcc.h
 
    * Component: Keil::Device:StdPeriph Drivers:USART@3.6.0
       Include file:  Device/StdPeriph_Driver/inc/stm32f10x_usart.h
       Source file:   Device/StdPeriph_Driver/src/stm32f10x_usart.c
-Build Time Elapsed:  00:00:01
+Build Time Elapsed:  00:00:00
 </pre>
 </body>
 </html>
