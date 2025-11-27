@@ -1,14 +1,16 @@
 #include <Arduino.h>
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
-#include "esp_system.h"
+
+
 #define BT1 32
 #define BT2 33
 #define BT3 25
 #define BT4 5
 LiquidCrystal_I2C lcd1(0x27, 16, 2); // LCD phát
 LiquidCrystal_I2C lcd2(0x26, 16, 2); // LCD nhận
-char a[33]; // 32 ký tự + '\0'
+int bit_receive = 50; // so bit truyen
+char *a = new char[bit_receive + 1]; 
 
 float p = 0.300; // Xác suất lỗi bit
 float BER = 0.000;
@@ -22,7 +24,7 @@ void setup() {
   lcd2.init();
   lcd2.backlight();
   lcd2.clear();
-  lcd2.print("Waiting...");
+  lcd2.print("Waiting..."); // printf("HELLO");
 
   Serial.begin(115200);                      
   Serial2.begin(115200, SERIAL_8N1, 16, 17);   // UART2: RX=16, TX=17 -> kenh phat
@@ -37,6 +39,8 @@ void setup() {
   pinMode(BT4, INPUT_PULLUP);
   Serial1.print("P=");
   Serial1.print(p);
+  Serial1.print("BIT=");
+  Serial1.print(bit_receive);
 }
 
 void loop() {
@@ -48,10 +52,11 @@ void loop() {
   {
     button2();
     button3();
+    button4();
   }
     
   // --- NHẬN DỮ LIỆU từ STM32 -> LCD ---
-  button();
+  button1();
 }
 
 void _lcd_display(void) {
@@ -70,24 +75,32 @@ void _lcd_display(void) {
   }
 
   if (Serial2.available()) {
-    int n = Serial2.readBytes(a, 32);
+    int n = Serial2.readBytes(a, bit_receive);
     a[n] = '\0'; // kết thúc chuỗi an toàn
 
     lcd1.clear();
     lcd2.clear();
     Serial.print("Nhan duoc: ");
-    Serial.println(a);
+    //Serial.println(a);
     // In lên LCD1 (chuỗi gốc)
     lcd1.setCursor(0, 0);
     for (int i = 0; i < 16 && a[i] != '\0'; i++)
+    {
       lcd1.print(a[i]);
-    
+      Serial.print(a[i]);
+    }
+      
+    delay(500);
     if (n > 16) {
       lcd1.setCursor(0, 1);
       for (int i = 16; i < n && a[i] != '\0'; i++)
-        lcd1.print(a[i]);
+      {
+         lcd1.print(a[i]);
+         Serial.print(a[i]);
+      }
+        
     }
-
+      Serial.println();
     // Mô phỏng lỗi bit và in lên LCD2
     lcd2.setCursor(0, 0);
     for (int i = 0; i < n; i++) {
@@ -102,7 +115,7 @@ void _lcd_display(void) {
       // In ra LCD2
       if (i == 16) lcd2.setCursor(0, 1);
       lcd2.print(a[i]);
-     // delay(100); // chờ hiển thị
+      //delay(100); // chờ hiển thị
     }
     Serial.print("Gia tri p: "); Serial.println(p);
     Serial.print("Bit BSC:   ");
@@ -118,8 +131,8 @@ void _lcd_display(void) {
   }
 }
 
-void button() {
-  static bool lastState = LOW;  // nhớ trạng thái nút lần trước
+void button1() {
+  static bool lastState = LOW;  // nhớ trạng thái nút lần trước và được khởi tạo 1 lần duy nhất 
   bool currentState = digitalRead(BT1);
 
   if (lastState == LOW && currentState == HIGH) {  // phát hiện nhấn xuống
@@ -133,54 +146,111 @@ void button() {
   lastState = currentState;  // cập nhật trạng thái
 }
 
- void button2()
-{
-  static bool lastState2 = LOW;  // nhớ trạng thái nút lần trước
+
+// Biến toàn cục để theo dõi chế độ
+bool mode_p = true; // true = chế độ thay đổi p, false = chế độ thay đổi bit_receive
+
+// Hàm button2 được cập nhật - tăng giá trị
+void button2() {
+  static bool lastState2 = LOW;
   bool currentState2 = digitalRead(BT2);
-
-  if (lastState2 == LOW && currentState2 == HIGH) {  // phát hiện nhấn xuống
-    delay(20);  // chống dội
-    if (digitalRead(BT2) == HIGH && p <= 1.0) {
-      p = p + 0.1;
-      Serial1.print("P=");
-      Serial1.println(p, 3);
+  
+  if (lastState2 == LOW && currentState2 == HIGH) {
+    delay(20); // chống dội
+    if (digitalRead(BT2) == HIGH) {
+      if (mode_p) {
+        // Chế độ thay đổi p
+        if (p < 1.0) {
+          p = p + 0.1;
+          if (p > 1.0) p = 1.0; // giới hạn tối đa
+          Serial.print("P tang: ");
+          Serial.println(p, 3);
+          Serial1.print("P=");
+          Serial1.println(p, 3);
+        }
+      } else {
+        // Chế độ thay đổi bit_receive
+        bit_receive += 100; // tăng 100 bit mỗi lần
+        if (bit_receive >= 1200) bit_receive = 1200; // giới hạn tối đa
+        
+        // Cấp phát lại bộ nhớ
+        delete[] a;
+        a = new char[bit_receive + 1];
+        
+        Serial.print("Bit_receive tang: ");
+        Serial.println(bit_receive);
+        Serial1.print("BIT=");
+        Serial1.println(bit_receive);
+      }
     }
-
   }
-
-  lastState2 = currentState2;  // cập nhật trạng thái
+  lastState2 = currentState2;
 }
-  void button3()
-{
-  static bool lastState3 = LOW;  // nhớ trạng thái nút lần trước
+
+// Hàm button3 được cập nhật - giảm giá trị
+void button3() {
+  static bool lastState3 = LOW;
   bool currentState3 = digitalRead(BT3);
-
-  if (lastState3 == LOW && currentState3 == HIGH) {  // phát hiện nhấn xuống
-    delay(20);  // chống dội
-    if (digitalRead(BT3) == HIGH && p >= 0.0 ) {
-      p = p - 0.1;
-      Serial1.print("P=");
-      Serial1.println(p, 3);
-      // Serial1.print("Gia tri xac suat loi p la: "); Serial1.print(p); Serial1.write('\n');
+  
+  if (lastState3 == LOW && currentState3 == HIGH) {
+    delay(20); // chống dội
+    if (digitalRead(BT3) == HIGH) {
+      if (mode_p) {
+        // Chế độ thay đổi p
+        if (p > 0.0) {
+          p = p - 0.1;
+          if (p < 0.0) p = 0.0; // giới hạn tối thiểu
+          Serial.print("P giam: ");
+          Serial.println(p, 3);
+          Serial1.print("P=");
+          Serial1.println(p, 3);
+        }
+      } else {
+        // Chế độ thay đổi bit_receive
+        if (bit_receive > 100) {
+          bit_receive -= 100; // giảm 100 bit mỗi lần
+          if (bit_receive <= 100) bit_receive = 50; // giới hạn tối thiểu
+          
+          // Cấp phát lại bộ nhớ
+          delete[] a;
+          a = new char[bit_receive + 1];
+          
+          Serial.print("Bit_receive giam: ");
+          Serial.println(bit_receive);
+          Serial1.print("BIT=");
+          Serial1.println(bit_receive);
+        }
+      }
     }
   }
-
-  lastState3 = currentState3;  // cập nhật trạng thái
+  lastState3 = currentState3;
 }
-  void button4()
-{
-  static bool lastState4 = LOW;  // nhớ trạng thái nút lần trước
-  bool currentState4 = digitalRead(BT4);
 
-  if (lastState4 == LOW && currentState4 == HIGH) {  // phát hiện nhấn xuống
-    delay(20);  // chống dội
-    if (digitalRead(BT4) == HIGH ) {
+// Hàm button4 mới - chuyển đổi chế độ
+void button4() {
+  static bool lastState4 = LOW;
+  bool currentState4 = digitalRead(BT4);
+  
+  if (lastState4 == LOW && currentState4 == HIGH) {
+    delay(20); // chống dội
+    if (digitalRead(BT4) == HIGH) {
+      // Chuyển đổi chế độ
+      mode_p = !mode_p;
       
-      
-      Serial1.println(2);
-      // Serial1.print("Gia tri xac suat loi p la: "); Serial1.print(p); Serial1.write('\n');
+      if (mode_p) {
+        Serial.println("=== CHE DO: THAY DOI P ===");
+        Serial.print("Gia tri hien tai: ");
+        Serial.println(p, 3);
+       // Serial1.print("MODE=P");
+       // Serial1.write('\n');
+      } else {
+        Serial.println("=== CHE DO: THAY DOI BIT_RECEIVE ===");
+        Serial.print("Gia tri hien tai: ");
+        Serial.println(bit_receive);
+      //  Serial1.print("MODE=BIT");
+       // Serial1.write('\n');
+      }
     }
   }
-
-  lastState4 = currentState4;  // cập nhật trạng thái
+  lastState4 = currentState4;
 }
