@@ -1,110 +1,108 @@
+// Copyright 2024 Espressif Systems (Shanghai) PTE LTD
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @brief This example demonstrates simple Zigbee light bulb.
+ *
+ * The example demonstrates how to use Zigbee library to create a end device light bulb.
+ * The light bulb is a Zigbee end device, which is controlled by a Zigbee coordinator.
+ *
+ * Proper Zigbee mode must be selected in Tools->Zigbee mode
+ * and also the correct partition scheme must be selected in Tools->Partition Scheme.
+ *
+ * Please check the README.md for instructions and more detailed description.
+ *
+ * Created by Jan Procházka (https://github.com/P-R-O-C-H-Y/)
+ */
+
 #ifndef ZIGBEE_MODE_ED
-#error "Please select Zigbee End Device mode"
+#error "Zigbee end device mode is not selected in Tools->Zigbee mode"
 #endif
 
 #include "Zigbee.h"
 
-#define BUTTON_PIN 9
-#define ENDPOINT_ID 1
+/* Zigbee light bulb configuration */
+#define ZIGBEE_LIGHT_ENDPOINT 10
+uint8_t led = 8;
+uint8_t button = BOOT_PIN;
 
-ZigbeeSwitch zbSwitch(ENDPOINT_ID);
-bool ledState = false;
+ZigbeeLight zbLight = ZigbeeLight(ZIGBEE_LIGHT_ENDPOINT);
 
+/********************* RGB LED functions **************************/
+void setLED(bool value) {
+  digitalWrite(led, value);
+}
+
+/********************* Arduino functions **************************/
 void setup() {
   Serial.begin(115200);
-  delay(2000);
-  
-  Serial.println("\n=== END DEVICE ===");
-  
-  pinMode(BUTTON_PIN, INPUT_PULLUP);
-  
-  zbSwitch.setManufacturerAndModel("Espressif", "EDSwitch");
-  zbSwitch.allowMultipleBinding(true);
-  
-  Zigbee.addEndpoint(&zbSwitch);
-  
-  // QUAN TRỌNG: End Device KHÔNG dùng setRebootOpenNetwork
-  
-  Serial.println("Khởi động End Device...");
-  if (!Zigbee.begin()) {  // KHÔNG truyền tham số role
-    Serial.println("ERROR: Khởi động thất bại!");
+
+  // Init LED and turn it OFF (if LED_PIN == RGB_BUILTIN, the rgbLedWrite() will be used under the hood)
+  pinMode(led, OUTPUT);
+  digitalWrite(led, LOW);
+
+  // Init button for factory reset
+  pinMode(button, INPUT_PULLUP);
+
+  //Optional: set Zigbee device name and model
+  // zbLight.setManufacturerAndModel("Espressif", "ZBLightBulb");
+
+  // // Set callback function for light change
+  // zbLight.onLightChange(setLED);
+
+  // //Add endpoint to Zigbee Core
+  // Serial.println("Adding ZigbeeLight endpoint to Zigbee Core");
+  // Zigbee.addEndpoint(&zbLight);
+
+  // When all EPs are registered, start Zigbee. By default acts as ZIGBEE_END_DEVICE
+  if (!Zigbee.begin()) {
+    Serial.println("Zigbee failed to start!");
+    Serial.println("Rebooting...");
     ESP.restart();
   }
-  
-  Serial.println("✓ End Device đã khởi động!");
-  Serial.println("→ Đang tìm Coordinator...\n");
-  
-  // Chờ kết nối với mạng
-  Serial.print("Đang join network");
-  int timeout = 0;
-  while (!Zigbee.connected() && timeout < 300) {  // 30 giây
+  Serial.println("Connecting to network");
+  int cnt = 0;
+  while (!Zigbee.connected()) {
     Serial.print(".");
     delay(100);
-    timeout++;
+    cnt++;
+    if(cnt == 50) 
+    {
+      Serial.println("reset again!");
+      ESP.restart();
+    }
   }
-  
-  if (!Zigbee.connected()) {
-    Serial.println("\n✗ KHÔNG thể kết nối mạng!");
-    Serial.println("Kiểm tra:");
-    Serial.println("1. Coordinator đã chạy chưa?");
-    Serial.println("2. Coordinator có mở mạng không?");
-    Serial.println("3. Cả 2 board cùng kênh Zigbee?");
-    Serial.println("\n→ Khởi động lại sau 5 giây...");
-    delay(5000);
-    ESP.restart();
-  }
-  
-  Serial.println("\n✓ Đã kết nối mạng!");
-  Serial.println("→ Đang binding với Light...\n");
-  
-  // Chờ binding
-  Serial.print("Đang binding");
-  timeout = 0;
-  while (!zbSwitch.bound() && timeout < 300) {  // 30 giây
-    Serial.print(".");
-    delay(100);
-    timeout++;
-  }
-  
-  if (!zbSwitch.bound()) {
-    Serial.println("\n✗ KHÔNG thể binding!");
-    Serial.println("→ Thử reset cả 2 thiết bị");
-    while(1) delay(1000);
-  }
-  
-  Serial.println("\n✓✓✓ ĐÃ BINDING THÀNH CÔNG! ✓✓✓");
-  Serial.println("\nNhấn nút BOOT:");
-  Serial.println("  Nhấn xuống → ON");
-  Serial.println("  Thả ra    → OFF\n");
+  Serial.println();
 }
 
 void loop() {
-  static bool lastState = HIGH;
-  static unsigned long lastTime = 0;
-  
-  bool currentState = digitalRead(BUTTON_PIN);
-  
-  if (currentState != lastState) {
-    if (millis() - lastTime > 50) {
-      lastTime = millis();
-      
-      if (lastState == HIGH && currentState == LOW) {
-        if (!ledState) {
-          Serial.println("→ Gửi ON");
-          zbSwitch.lightOn();
-          ledState = true;
-        }
-      }
-      else if (lastState == LOW && currentState == HIGH) {
-        if (ledState) {
-          Serial.println("→ Gửi OFF");
-          zbSwitch.lightOff();
-          ledState = false;
-        }
-      }
-    }
-  }
-  
-  lastState = currentState;
-  delay(10);
+  // // Checking button for factory reset
+  // if (digitalRead(button) == LOW) {  // Push button pressed
+  //   // Key debounce handling
+  //   delay(100);
+  //   int startTime = millis();
+  //   while (digitalRead(button) == LOW) {
+  //     delay(50);
+  //     if ((millis() - startTime) > 3000) {
+  //       // If key pressed for more than 3secs, factory reset Zigbee and reboot
+  //       Serial.println("Resetting Zigbee to factory and rebooting in 1s.");
+  //       delay(1000);
+  //       Zigbee.factoryReset();
+  //     }
+  //   }
+  //   // Toggle light by pressing the button
+  //   zbLight.setLight(!zbLight.getLightState());
+  // }
+  delay(100);
 }

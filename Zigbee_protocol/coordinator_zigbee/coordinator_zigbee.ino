@@ -4,18 +4,16 @@
 
 #include "Zigbee.h"
 
-#define LIGHT_ENDPOINT_NUMBER 5
-#define LED_PIN 8
+#define SWITCH_ENDPOINT_NUMBER 5
 
-ZigbeeLight zbLight = ZigbeeLight(LIGHT_ENDPOINT_NUMBER);
-
-void onLightChange(bool state) {
-  digitalWrite(LED_PIN, state ? HIGH : LOW);
-  Serial.println("\n════════════════════════════════");
-  Serial.printf("🔔 Nhận lệnh: %s\n", state ? "ON" : "OFF");
-  Serial.printf("   LED: %s\n", state ? "SÁNG 💡" : "TẮT");
-  Serial.println("════════════════════════════════\n");
-}
+ZigbeeSwitch zbSwitch = ZigbeeSwitch(SWITCH_ENDPOINT_NUMBER);
+// void onLightChange(bool state) {
+//   digitalWrite(LED_PIN, state ? HIGH : LOW);
+//   Serial.println("\n════════════════════════════════");
+//   Serial.printf("🔔 Nhận lệnh: %s\n", state ? "ON" : "OFF");
+//   Serial.printf("   LED: %s\n", state ? "SÁNG 💡" : "TẮT");
+//   Serial.println("════════════════════════════════\n");
+// }
 
 void setup() {
   Serial.begin(115200);
@@ -23,14 +21,13 @@ void setup() {
   
   Serial.println("\n=== COORDINATOR ===");
   
-  pinMode(LED_PIN, OUTPUT);
-  digitalWrite(LED_PIN, LOW);
   
-  zbLight.setManufacturerAndModel("Espressif", "CoordLight");
-  zbLight.onLightChange(onLightChange);
+  // zbLight.setManufacturerAndModel("Espressif", "CoordLight");
+
+  // zbLight.onLightChange(onLightChange);
   
-  Zigbee.addEndpoint(&zbLight);
-  
+  // Zigbee.addEndpoint(&zbLight);
+  Zigbee.addEndpoint(&zbSwitch);
   // QUAN TRỌNG: Mở mạng ngay khi reboot
   Zigbee.setRebootOpenNetwork(180);  // Mở 180 giây
   
@@ -38,11 +35,19 @@ void setup() {
   if (!Zigbee.begin(ZIGBEE_COORDINATOR)) {
     Serial.println("ERROR: Khởi động thất bại!");
     ESP.restart();
-  }
-  
-  Serial.println("✓ Coordinator đã sẵn sàng!");
+  }Serial.println("✓ Coordinator đã sẵn sàng!");
   Serial.println("✓ Mạng đang MỞ trong 180 giây");
   Serial.println("→ Bây giờ hãy reset End Device\n");
+   while (!zbSwitch.bound()) {
+    Serial.printf(".");
+    delay(500);
+  }
+  {
+    Serial.println("connceted success");
+  }
+
+  
+
 }
 
 void loop() {
